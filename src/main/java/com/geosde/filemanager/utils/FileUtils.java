@@ -1,6 +1,7 @@
 package com.geosde.filemanager.utils;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class FileUtils {
 
@@ -73,7 +75,7 @@ public class FileUtils {
 			list = new ArrayList<>();
 			fis = new FileInputStream(source_file);
 			bos = new ByteArrayOutputStream(buffer);
-			byte[] b = new byte[buffer * buffer];
+			byte[] b = new byte[buffer * 1024];
 			int n;
 			while ((n = fis.read(b)) != -1) {
 				byte[] temp = new byte[n];
@@ -87,6 +89,36 @@ public class FileUtils {
 		}
 		return list;
 	}
+	
+	public static List<byte[]>  split(byte[] file, int buffer) {
+		List<byte[]> list = null;
+		ByteArrayInputStream is = new ByteArrayInputStream(file);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(buffer);
+		String uuid = UUID.randomUUID().toString();
+		String filename = "";
+		long size = 0;
+		String extName = "";
+		byte[] b = new byte[buffer * 1024];
+		int n;
+		int count = 0;
+		list = new ArrayList<>();
+		size = 0;
+		try {
+			while ((n = is.read(b)) != -1) {
+				size += n;
+				byte[] temp = new byte[n];
+				System.arraycopy(b, 0, temp, 0, n);
+				list.add(temp);
+				count++;
+			}
+			is.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
 
 	public static long getFileSizes(File f) throws Exception {// 取得文件大小
 		long s = 0;
